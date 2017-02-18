@@ -19,6 +19,12 @@ app.init = function () {
   //$(document).submit(app.handleSubmit);
 
   // $('#send .submit').submit(app.handleSubmit);
+
+  $(document).keypress(function(event) {
+    if ((event.keyCode || event.which) === 13 ) {
+      app.handleSubmit();
+    }
+  });
 };
 
 app.send = function (message) {
@@ -26,7 +32,7 @@ app.send = function (message) {
     url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
     type: 'POST',
     data: JSON.stringify(message),
-    contentType: 'jsonp',
+    contentType: 'application/json',
     success: function (data) {
       console.log('chatterbox: Message sent', data);
     },
@@ -41,8 +47,9 @@ app.fetch = function () {
   $.ajax({
     url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
     type: 'GET',
-    // data: 
-    contentType: 'jsonp',
+    // order: 'createdAt',
+    data: 'order=-createdAt', 
+    contentType: 'application/json',
     success: app.parseMessage,
   });
 };
@@ -52,7 +59,6 @@ app.clearMessages = function () {
 };
 
 app.parseMessage = function (messageArray) {
-  console.log('messages recieved');
   // messageArray.forEach(app.renderMessage);
   app.clearMessages();  
   _.each(messageArray.results, app.renderMessage);
@@ -64,7 +70,7 @@ app.renderMessage = function (message) {
 };
 
 app.renderRoom = function (room) {
-  $('#roomSelect').append(`<section>${room}</section>`);
+  $('#roomSelect').append(`<option>${room}</option>`);
 };
 
 
@@ -73,13 +79,12 @@ app.handleUsernameClick = function () {
 };
 
 app.handleSubmit = function () {
-  var message = {username: 'Jeff',
+  var message = {username: 'the Joker',
     text: $('.message')[0].value,
     roomname: 'lobby'
   };
-  console.log(message);
   app.send(message);
-  // return false;
+  $('.message').val('');
 };
 
 app.init();
