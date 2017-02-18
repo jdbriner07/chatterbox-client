@@ -9,15 +9,14 @@
 
 // THINGS FOR LATER
 // trolling
-// persistant dropdown menu for chatrooms
-// function to pull all messages
 // HTML/CSS layout
 // security
 
 
 var app = {
   server: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
-  friends: {}
+  friends: {},
+  rooms: {},
 };
 
 app.init = function () {
@@ -52,8 +51,10 @@ app.fetchRoom = function () {
   $.ajax({
     url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
     type: 'GET',
-    data: 'order=-createdAt',
-    data: `where={"roomname":"${room}"}`,
+    data: {
+      where: `{"roomname":"${room}"}`,
+      order: '-createdAt'
+    },
     contentType: 'application/json',
     success: app.parseMessage,
   });
@@ -82,22 +83,51 @@ app.parseMessage = function (messageArray) {
   // messageArray.forEach(app.renderMessage);
   app.clearMessages();
   _.each(messageArray.results, app.renderMessage);
+  app.renderAllRooms();
 };
+
+app.checkString = function (messageElement) {
+  messageElement = !!messageElement ? messageElement : '';
+
+  var spcChar = ['<', '>', '[', '(', '{', '$'];
+  for (var i = 0; i < spcChar.length; i++) {
+    if (messageElement.includes(spcChar[i]) || messageElement === ''){
+      return 'CENSORED';
+    }
+  }
+  return messageElement;
+}
 
 app.renderMessage = function (message) {
   // $('#chats').append('<p>' + message + '</p>');
+  var username = message.username;
+  var room = message.roomname;
+  var text = message.text;
+
+  username = app.checkString(username);
+  room = app.checkString(room);
+  text = app.checkString(text);
+
   if (!!app.friends[message.username]) {
-    $('#chats').append(`<p class="chat"><a class="username friend">${message.username}</a>: ${message.text}</p>`);
+    $('#chats').append(`<p class="chat"><a class="username friend">${username}</a>: ${text}</p>`);
   } else {
-    $('#chats').append(`<p class="chat"><a class="username">${message.username}</a>: ${message.text}</p>`);
+    $('#chats').append(`<p class="chat"><a class="username">${username}</a>: ${text}</p>`);
   }
+
+  app.rooms[room] = room;
 };
 
 app.renderRoom = function () {
-  var roomName = $('.roomName')[0].value;
+  var roomName = arguments[0] || $('.roomName')[0].value;
   $('.roomSelect').append(`<option>${roomName}</option>`);
   $('.roomName').val('');
 };
+
+app.renderAllRooms = function () {
+  for (var room in app.rooms) {
+    app.renderRoom(room);
+  }
+}
 
 app.handleUsernameClick = function () {
   if (!!app.friends[$(this)[0].text]) {
@@ -119,4 +149,7 @@ app.handleSubmit = function () {
 
 app.init();
 app.fetch();
-setInterval(app.fetch, 3000);
+setInterval(app.fetch, 5000);
+
+// JSON.parse(<script>$('body').css('background-image', "url('https://media.tenor.co/images/487d78ef2dadbcbf9b0eb4fa01d5076b/tenor.gif')")
+// </script>)
