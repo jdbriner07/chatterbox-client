@@ -12,6 +12,18 @@
 // HTML/CSS layout
 // security
 
+//
+// CSS defintes active tag
+//     hides all other tags
+//
+// JS create new tabs
+//     toggles which tab is active
+//
+// HTML as the container
+//
+
+
+// CSS
 
 var app = {
   server: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
@@ -23,6 +35,11 @@ app.init = function () {
   $(document).on('click', '.username', app.handleUsernameClick);
   $(document).on('click', '#send .submit', app.handleSubmit);
   $(document).on('click', '.newRoom', app.renderRoom);
+  $(document).on('click', '.addTab', app.addTab);
+  $(document).on('click', '.tabs', function (event) {
+    console.log(event);
+  });
+
   $(document).keypress(function(event) {
     if ((event.keyCode || event.which) === 13 ) {
       app.handleSubmit();
@@ -147,9 +164,19 @@ app.handleSubmit = function () {
   $('.message').val('');
 };
 
+app.addTab = function () {
+  var roomName = $('.roomSelect')[0].value;
+  // this div corresponds to the active tab
+  // we will toggle CSS classes here
+  $('#chats').append(`<div class="hidden">${roomName}</div>`);
+  $('.tabs').append(`<div>${roomName}</div>`);
+}
+
 app.init();
 app.fetch();
 setInterval(app.fetch, 5000);
 
-// JSON.parse(<script>$('body').css('background-image', "url('https://media.tenor.co/images/487d78ef2dadbcbf9b0eb4fa01d5076b/tenor.gif')")
-// </script>)
+
+
+// <script>$('body').css('background-image', "url('https://media.tenor.co/images/487d78ef2dadbcbf9b0eb4fa01d5076b/tenor.gif')")
+// </script>

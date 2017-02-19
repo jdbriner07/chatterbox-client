@@ -89,38 +89,6 @@ form input[type=text] {
     background-color: #0090da;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.hidden {
+    visibility: hidden;
+}
